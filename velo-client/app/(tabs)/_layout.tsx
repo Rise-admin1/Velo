@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Type } from '@/constants/typography';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -9,6 +10,10 @@ import useLoginAccountStore from '@/store/loginAccountStore';
 export default function TabLayout() {
   const { colors } = useAppTheme();
   const { accountLoginData } = useLoginAccountStore();
+  const insets = useSafeAreaInsets();
+  // A numeric tab bar height replaces the navigator's built-in inset.
+  // On Android that inset is the 3-button (or gesture) navigation bar.
+  const androidNavInset = Platform.OS === 'android' ? insets.bottom : 0;
 
   return (
     <Tabs
@@ -25,8 +30,9 @@ export default function TabLayout() {
           backgroundColor: colors.tabBar,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 64,
+          height: (Platform.OS === 'ios' ? 88 : 64) + androidNavInset,
           paddingTop: 6,
+          ...(Platform.OS === 'android' ? { paddingBottom: androidNavInset } : {}),
           elevation: 0,
           shadowOpacity: 0,
         },
